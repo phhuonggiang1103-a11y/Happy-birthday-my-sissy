@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#f7e9e7" />
+  <title>A Little Universe — For chị Linh</title>
+  
+  <!-- Font chữ 100% Việt hoá -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Chèn CSS ghi đè sửa lỗi giao diện và Font chữ thẳng vào đây -->
+  <style>
+    /* Chỉnh Font chữ */
+    body { font-family: 'Be Vietnam Pro', sans-serif !important; }
+    h1, h2, h3, .tarot-title, .envelope-label, #game-title { font-family: 'Playfair Display', serif !important; }
+    .handwriting { font-family: 'Patrick Hand', cursive !important; font-size: 1.35rem; line-height: 1.6; }
+    
+    /* Căn giữa màn hình như App nếu mở trên Laptop */
+    body { margin: 0; display: flex; justify-content: center; background-color: #e0d5d3; height: 100vh; overflow: hidden; }
+    #app { width: 100%; max-width: 480px; height: 100vh; background-color: #f7e9e7; position: relative; overflow-y: auto; overflow-x: hidden; box-shadow: 0 0 30px rgba(0,0,0,0.15); }
+    
+    /* Gạch Piano rơi chậm lại để dễ bấm */
+    .lane { position: relative; height: 100%; overflow: hidden; }
+    .tile { position: absolute; width: 90%; margin: 0 5%; height: 120px; background-color: #2c3e50; border-radius: 8px; cursor: pointer; -webkit-tap-highlight-color: transparent; animation: dropTile 2.5s linear forwards !important; }
+    @keyframes dropTile { 0% { top: -130px; } 100% { top: 100%; } }
+  </style>
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <main id="app">
+    <!-- 01: ENVELOPE (Giữ nguyên) -->
+    <section class="scene active" id="scene-envelope" aria-labelledby="envelope-title">
+      <div class="intro-note">a tiny corner of the universe, made just for you</div>
+      <div class="envelope-wrap">
+        <div class="envelope" id="open-envelope" role="button" tabindex="0" aria-label="Mở phong thư sinh nhật">
+          <div class="envelope-back"></div>
+          <div class="letter-peek">
+            <span class="letter-small">A LITTLE NOTE FOR YOU</span>
+            <span class="letter-heart">♡</span>
+          </div>
+          <div class="envelope-front"></div>
+          <div class="envelope-flap"></div>
+          <div class="wax-seal">G</div>
+          <div class="envelope-label">Special gift from Giang to chị Linh</div>
+        </div>
+        <p class="envelope-hint">tap the envelope to open your gift ✦</p>
+      </div>
+      <div class="tiny-footer">made with love, from Giang ♡</div>
+    </section>
+
+    <!-- 02: PIANO GAME (Đã sửa 12s) -->
+    <section class="scene" id="scene-game" aria-labelledby="game-title">
+      <div class="section-kicker">chapter one · our song</div>
+      <h1 id="game-title">A song that reminds me of you</h1>
+      <p class="scene-subtitle">Một bài hát, vài ký ức, và 12 giây dành riêng cho chị.</p>
+      <div class="game-shell">
+        <div class="game-topline">
+          <span class="game-label">SAFE &amp; SOUND · MINI CHALLENGE</span>
+          <div class="game-stats">
+            <span>★ <b id="score">0</b></span>
+            <span><b id="time-left">12.0</b>s</span>
+          </div>
+        </div>
+        <div class="game-start-overlay" id="game-start-overlay">
+          <div class="music-disc">♫</div>
+          <h2>Ready, chị Linh?</h2>
+          <p>Chạm vào ô đen bất kỳ lúc nào trên đường rơi. Let's play!</p>
+          <button class="button button-dark" id="start-game">LET'S PLAY ♡</button>
+          <small>Đeo tai nghe nếu chị thích nghe nhạc rõ hơn.</small>
+        </div>
+        <div class="piano-board" id="piano-board" aria-label="Piano Tiles game">
+          <div class="lane" data-lane="0"></div>
+          <div class="lane" data-lane="1"></div>
+          <div class="lane" data-lane="2"></div>
+          <div class="lane" data-lane="3"></div>
+          <div class="hit-flash" id="hit-flash"></div>
+          <div class="game-countdown" id="game-countdown" aria-live="polite"></div>
+        </div>
+        <div class="game-bottomline">
+          <div class="progress-track"><div class="progress-fill" id="game-progress"></div></div>
+          <span id="game-status">Ready when you are ♡</span>
+        </div>
+      </div>
+      <audio id="song-audio" preload="auto" src="assets/music/audio.mp3"></audio>
+    </section>
+
+    <!-- 02B: SONG MESSAGE (Giữ nguyên) -->
+    <section class="scene letter-scene" id="scene-song-note">
+      <div class="paper-card song-paper">
+        <div class="paper-stamp">FOR MY SAFE PLACE ♡</div>
+        <div class="paper-flower">✿</div>
+        <p class="handwriting" id="song-message">Đây là bài hát khiến em nghĩ tới chị đầu tiên, tại hồi nhỏ cứ ở với chị là em được nghe bài này suốt à =))) Với em, chị luôn là một safe zone, kiểu dù có chuyện gì hay có mệt mỏi đến đâu thì ở cạnh chị em vẫn thấy thoải mái, được là chính mình và chẳng cần phải nghĩ ngợi gì nhiều. Nói chung là hong biết diễn tả sao nhưng mà bài này làm em nhớ tới chị nhiều lắm á.</p>
+        <div class="signature">love, Giang ♡</div>
+        <button class="button button-pink" data-next="scene-gallery">LET'S LOOK BACK ♡</button>
+      </div>
+    </section>
+
+    <!-- 03: GALLERY (Giữ nguyên) -->
+    <section class="scene" id="scene-gallery">
+      <div class="section-kicker">chapter two · our memories</div>
+      <h1>Little moments, big love.</h1>
+      <p class="scene-subtitle">Twelve little pieces of us, kept in one place.</p>
+      <div class="scrapbook" id="photo-grid" aria-label="Album ảnh của Giang và chị Linh"></div>
+      <div class="gallery-note paper-card">
+        <div class="paper-stamp">18 YEARS OF US</div>
+        <p class="handwriting">Mà em mới nhận ra chị em mình quen biết nhau 18 năm rồi mà hình chụp chung ít ghê á =))) Hồi nhỏ còn có nhiều hơn xíu nữa chứ, lớn lên cái chẳng chụp chung mấy luôn. Thôi mốt phải chụp với nhau nhiều hơn nhe, để sau này còn có hình mà nhìn lại nữa 🥹💗</p>
+        <div class="signature">to many more memories ♡</div>
+        <button class="button button-pink" data-next="scene-video">ONE LAST LITTLE SURPRISE →</button>
+      </div>
+    </section>
+
+    <!-- 04: VIDEO (Giữ nguyên) -->
+    <section class="scene" id="scene-video">
+      <div class="section-kicker">chapter three · a little message</div>
+      <h1>Some things are better said out loud.</h1>
+      <p class="scene-subtitle">A little video, just for you.</p>
+      <div class="video-frame">
+        <div class="film-holes" aria-hidden="true"></div>
+        <div class="video-inner">
+          <video id="birthday-video" controls playsinline preload="metadata">
+            <source src="assets/video/video.mp4" type="video/mp4">
+            Trình duyệt của bạn không hỗ trợ video.
+          </video>
+          <div class="video-placeholder" id="video-placeholder">
+            <div class="video-play-icon">▶</div>
+            <h2>A birthday message from Giang</h2>
+            <p>Video sẽ xuất hiện ở đây khi em thêm file <code>video.mp4</code>.</p>
+            <span class="placeholder-badge">COMING SOON ♡</span>
+          </div>
+        </div>
+        <div class="film-holes" aria-hidden="true"></div>
+      </div>
+      <button class="button button-pink" id="to-tarot">ENTER THE TAROT ROOM ✦</button>
+    </section>
+
+    <!-- 05: TAROT (Giữ nguyên 100%) -->
+    <section class="scene tarot-scene" id="scene-tarot">
+      <div class="stars" aria-hidden="true"></div>
+      <div class="section-kicker gold-kicker">chapter four · her next chapter</div>
+      <h1 class="tarot-title">The Birthday Chapter Spread</h1>
+      <p class="scene-subtitle">Three cards. Three messages for the year ahead.</p>
+      <div class="tarot-intro" id="tarot-intro">
+        <div class="tarot-orbit"><div class="orbit-card">✦</div><div class="orbit-card">☾</div><div class="orbit-card">✧</div></div>
+        <p>Take a breath, think of the year ahead, and choose the cards that call to you.</p>
+        <button class="button button-gold" id="shuffle-deck">SHUFFLE THE DECK ✦</button>
+        <span class="tarot-small">78 cards · 3 cards · a new chapter</span>
+      </div>
+      <div class="tarot-stage hidden" id="tarot-stage">
+        <div class="shuffle-status" id="shuffle-status">Shuffling the deck…</div>
+        <p class="tarot-instruction" id="tarot-instruction">Choose three cards that call to you.</p>
+        <div class="tarot-deck" id="tarot-deck" aria-label="Chọn ba lá bài Tarot"></div>
+        <div class="selection-status"><span id="selected-count">0</span> / 3 cards selected</div>
+        <button class="button button-gold hidden" id="reveal-cards">REVEAL MY CARDS</button>
+      </div>
+      <div class="tarot-results hidden" id="tarot-results">
+        <div class="revealed-cards" id="revealed-cards"></div>
+        <div class="tarot-closing">
+          <p class="gold-kicker">YOUR NEXT CHAPTER AWAITS ✦</p>
+          <h2>The cards have spoken…</h2>
+          <p>But your story is still yours to write.</p>
+          <p class="inbox-line">inbox tui để có lời giải thông điệp tuổi mới nha bà ♡</p>
+          <button class="button button-gold" id="copy-cards">COPY MY 3 CARDS</button>
+          <span class="copy-status" id="copy-status" aria-live="polite"></span>
+          <button class="text-button" id="restart-tarot">Shuffle again ↻</button>
+        </div>
+      </div>
+      <div class="tiny-footer tarot-footer">the universe is yours to explore ♡</div>
+    </section>
+  </main>
+
+  <div class="lightbox hidden" id="photo-lightbox" role="dialog" aria-modal="true" aria-label="Xem ảnh lớn">
+    <button class="lightbox-close" id="lightbox-close" aria-label="Đóng ảnh">×</button>
+    <button class="lightbox-arrow prev" id="lightbox-prev" aria-label="Ảnh trước">‹</button>
+    <img id="lightbox-image" src="" alt="Ảnh kỷ niệm" />
+    <button class="lightbox-arrow next" id="lightbox-next" aria-label="Ảnh tiếp theo">›</button>
+    <div class="lightbox-counter" id="lightbox-counter"></div>
+  </div>
+
+  <!-- CÁC FILE SCRIPT GỐC CỦA BẠN (Giữ nguyên Tarot, Envelope, Video...) -->
+  <script src="js/main.js"></script>
+  <script src="js/gallery.js"></script>
+  <script src="js/video.js"></script>
+  <script src="js/tarot.js"></script>
+
+  <!-- ĐOẠN SCRIPT GAME ĐÃ FIX LỖI (12s, Nhạc 0:52, Chạm ăn ngay) -->
+  <!-- Lưu ý: Mình đã bỏ dòng gọi js/game.js cũ để nó xài luôn code chạy mượt này -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        let score = 0;
+        let timeLeft = 12.0; 
+        let gameTimer;
+        let spawnTimer;
+
+        const startBtn = document.getElementById('start-game');
+        const overlay = document.getElementById('game-start-overlay');
+        const scoreEl = document.getElementById('score');
+        const timeEl = document.getElementById('time-left');
+        const lanes = document.querySelectorAll('.lane');
+        const audio = document.getElementById('song-audio');
+
+        if (startBtn) {
+            startBtn.addEventListener('click', startGame);
+        }
+
+        function startGame() {
+            overlay.style.display = 'none';
+            score = 0;
+            timeLeft = 12.0; 
+            scoreEl.innerText = score;
+            timeEl.innerText = timeLeft.toFixed(1);
+
+            if (audio) {
+                audio.currentTime = 52; // Phát từ giây thứ 52
+                audio.play().catch(e => console.log('Bật nhạc cần tương tác người dùng'));
+            }
+
+            // Đếm ngược
+            gameTimer = setInterval(() => {
+                timeLeft -= 0.1;
+                if (timeLeft <= 0) {
+                    timeLeft = 0;
+                    endGame();
+                }
+                timeEl.innerText = timeLeft.toFixed(1);
+            }, 100);
+
+            // Sinh gạch mỗi 600ms
+            spawnTimer = setInterval(spawnTile, 600);
+        }
+
+        function spawnTile() {
+            const laneIndex = Math.floor(Math.random() * 4);
+            const tile = document.createElement('div');
+            tile.className = 'tile';
+
+            const hitTile = function(e) {
+                e.preventDefault(); 
+                if (!tile.classList.contains('hit')) {
+                    tile.classList.add('hit');
+                    score++;
+                    scoreEl.innerText = score;
+                    tile.style.visibility = 'hidden'; 
+                }
+            };
+
+            // Bắt sự kiện siêu nhạy cho cả Touch và Click
+            tile.addEventListener('touchstart', hitTile, { passive: false });
+            tile.addEventListener('mousedown', hitTile);
+
+            // Xoá gạch khi rơi khỏi màn hình để tránh nặng DOM
+            tile.addEventListener('animationend', () => tile.remove());
+
+            lanes[laneIndex].appendChild(tile);
+        }
+
+        function endGame() {
+            clearInterval(gameTimer);
+            clearInterval(spawnTimer);
+            
+            if (audio) audio.pause();
+            
+            // Dọn dẹp gạch còn lại
+            document.querySelectorAll('.tile').forEach(t => t.remove());
+            
+            // Chuyển sang đọc thư
+            document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+            const nextScene = document.getElementById('scene-song-note');
+            if (nextScene) nextScene.classList.add('active');
+        }
+    });
+  </script>
+</body>
+</html>
